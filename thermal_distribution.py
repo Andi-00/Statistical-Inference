@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 # Set a random seed
-np.random.seed(5)
+np.random.seed(3)
 
 # Number of spins
 n = 5
@@ -35,31 +35,37 @@ def spin_flip(N, s, h, j):
     k = np.random.randint(0, n, N)
 
     states = []
+    copy = s.copy()
 
     # Loop to flip the spins
     for l in k:
+        # Values that are stored in an array
+        states.append(copy)
+
+        copy = states[-1].copy()
+
         # Computation of the energy difference
-        diff = dH(l, s, h, j)
+        diff = dH(l, copy, h, j)
 
         # Condition for a spin flip, when its energetically favourable
-        if diff <= 0 : s[l] *= -1
+        if diff <= 0 : copy[l] *= -1
         # Otherwise, thermal fluctuations can induce a spin flip with a certain probability
-        elif np.random.rand() < np.exp(-diff) : s[l] *= -1
+        elif np.random.rand() < np.exp(-diff) : copy[l] *= -1
         
-        # Values that are stred in an array
-        states.append(s)
-    
     return states
     
 
 # Number of spin flips
 N = int(1E4)
 
+# Every 10th configuration of the last n_train values is taken as train data
+n_train = int(1E3)
+
 # Perform the spin flips on the spins s
 s = spin_flip(N, s, h, j)
 
 # Only the values in the thermal equilibrium are used to compute the averages
-s = s[-1000 :: 10]
+s = s[- n_train :: 10]
 
 # Computation of the correlations
 s2 = np.einsum("ab, ac -> abc", s, s)
@@ -69,12 +75,11 @@ mean_s = np.mean(s, axis = 0)
 mean_s2 = np.mean(s2, axis = 0)
 
 print(mean_s)
-print(mean_s2)
 
 print(H(mean_s, h, j))
 
 # We are now going to infer the parameters h and j
-# For that we initialise some random values for h_0 and j_0
+# For that we first initialise some random values for h_0 and j_0
 h_0 = np.random.normal(0, 1, n)
 j_0 = np.random.normal(0, 1 / n, (n, n))
 
@@ -83,12 +88,12 @@ for i in range(n):
     j_0[:, i] = j[i, :]
 
 # Number of steps for the gradient descend
-m = int(100)
+m = int(50)
 
 # Learning rate a
 a = 0.2
 
-# Loss values that we store
+# Storage for the loss values
 loss = []
 
 # Loop for the gradient descend
@@ -100,7 +105,7 @@ for i in range(m):
 
     # MCMC algorithm for the spin flips of s_0
     s_0 = spin_flip(N, s_0, h_0, j_0)
-    s_0 = s_0[-1000 :: 10]
+    s_0 = s_0[- n_train :: 10]
 
     # Computation of the correlations
     s2_0 = np.einsum("ab, ac -> abc", s_0, s_0)
@@ -112,11 +117,8 @@ for i in range(m):
     h_0 += a * (mean_s - mean_s_0)
     j_0 += a * (mean_s2 - mean_s2_0)
 
-    for i in range(n):
-        j_0[i, i] = 0
-
     l = np.einsum("b, ab -> a", h_0, s) + np.einsum("ab, bc, ac", s, j_0, s) / 2
-    l = np.mean(l)
+    l = -np.mean(l)
     loss.append(l)
 
 print(h)
