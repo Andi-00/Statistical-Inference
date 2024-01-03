@@ -116,11 +116,8 @@ a = 0.3
 # Storage for the loss values
 loss = []
 
+# Comparison of the weights
 lsq = []
-
-# Stored values of the weights
-# h_history = []
-# j_history = []
 
 # Loop for the gradient descend
 for i in range(m):
@@ -143,17 +140,19 @@ for i in range(m):
     h_0 += a * (mean_s - mean_s_0)
     j_0 += a * (mean_s2 - mean_s2_0)
 
+    # MSE of the weights
     lsq.append(np.mean(np.append(((h_0 - h) ** 2).flatten(), (((j_0 - j) * n) ** 2).flatten())))
  
     l = np.einsum("b, ab -> a", h_0, s) + np.einsum("ab, bc, ac -> a", s, j_0, s) / 2
     l = -np.mean(l)
     loss.append(l)
 
+    # Progress
     if i % 10 == 0 : 
         print(i)
         print(lsq[-1])
         
-
+# Plot of the loss
 fig, ax = plt.subplots()
 
 x = np.arange(len(loss))
@@ -168,6 +167,7 @@ ax.set_title("Loss during the training")
 
 plt.savefig("./thermal_images/loss_plot.png")
 
+# Comparison of the true and infered couplings
 dh = h_0 - h
 dj = (j_0 - j) * n
 
@@ -185,6 +185,7 @@ print(h_0)
 print(j)
 print(j_0)
 
+# Plot of the histogram
 fig, ax = plt.subplots()
 
 errors = np.append(dh.flatten(), dj.flatten())
