@@ -1,5 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
+from time import time
 
 plt.rcParams['pgf.rcfonts'] = False
 plt.rcParams['font.serif'] = []
@@ -70,7 +71,7 @@ def spin_flip(N, s):
     for l in k:
 
         # Computation of the energy difference
-        diff = dH(l, s, h, j)
+        diff = dH(l, s)
 
         # Conditions for a spin flip
         if diff <= 0 : s[l] *= -1
@@ -101,6 +102,9 @@ a = 0.2
 # Storage for the loss values
 loss = []
 
+# We will use this variable later to track the time
+start = time()
+
 # Loop for the gradient descend
 for i in range(m):
 
@@ -127,11 +131,21 @@ for i in range(m):
 
     # Progress
     if i % 10 == 0 : 
-        print("Gradient descend step {}".format(i))
-        print("loss : {:.5f}\n".format(l))
 
-np.savetxt("./Weights/h_eq.txt", h, delimiter = " ")
-np.savetxt("./Weights/j_eq.txt", j, delimiter = " ")
+        end = time()
+
+        print("Gradient descend step {}".format(i))
+        print("Loss value     : {:.3f}".format(l))
+        print("Time / 10 steps: {:6.2f} s \n".format(end - start))
+
+        start = time()
+    
+    
+
+# Saving the weights for later comparison of the results
+np.savetxt("./Loss & Weights/h_eq.txt", h, delimiter = " ")
+np.savetxt("./Loss & Weights/j_eq.txt", j, delimiter = " ")
+np.savetxt("./Loss & Weights/loss_eq.txt", loss, delimiter = " ")
 
 # Plot of the loss
 fig, ax = plt.subplots()
