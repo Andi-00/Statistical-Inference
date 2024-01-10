@@ -18,8 +18,6 @@ plt.rcParams['legend.fontsize'] = 20
 plt.rcParams['savefig.dpi'] = 300
 plt.rcParams['savefig.bbox'] = 'tight'
 plt.rcParams['savefig.pad_inches'] = 0.1
-
-#plt.rcParams['savefig.transparent'] = True
 plt.rcParams['figure.figsize'] = (10, 7)
 
 # Set a random seed
@@ -40,8 +38,6 @@ for i in range(n):
 # Setup the spins
 s = np.random.randint(0, 2, n)
 s[s == 0] = -1
-
-print(s)
 
 # Calculation of the energy
 H = lambda s, h, j: - np.einsum("i, i ->", h, s) - np.einsum("a, ab, b ->", s, j, s) / 2
@@ -78,7 +74,7 @@ def spin_flip(N, s, h, j):
 N = int(2E4)
 
 # Every n_sep-th configuration of the last n_train values is taken as train data
-n_sep = 10
+n_sep = 5
 n_train = int(1E4)
 
 # Perform the spin flips on the spins s
@@ -94,10 +90,6 @@ s2 = np.einsum("ab, ac -> abc", s, s)
 mean_s = np.mean(s, axis = 0)
 mean_s2 = np.mean(s2, axis = 0)
 
-print(mean_s)
-
-print(H(mean_s, h, j))
-
 # We are now going to infer the parameters h and j
 # For that we first initialise some random values for h_0 and j_0
 h_0 = np.random.normal(0, 1, n)
@@ -108,7 +100,7 @@ for i in range(n):
     j_0[:, i] = j[i, :]
 
 # Number of steps for the gradient descend
-m = int(370)
+m = int(5E3)
 
 # Learning rate a
 a = 0.3
@@ -143,14 +135,15 @@ for i in range(m):
     # MSE of the weights
     lsq.append(np.mean(np.append(((h_0 - h) ** 2).flatten(), (((j_0 - j) * n) ** 2).flatten())))
  
-    l = np.einsum("b, ab -> a", h_0, s) + np.einsum("ab, bc, ac -> a", s, j_0, s) / 2
-    l = -np.mean(l)
+    l = np.einsum("i, i ->", h_0, mean_s) + np.einsum("ij, ij ->", j_0, mean_s2) / 2
     loss.append(l)
 
     # Progress
     if i % 10 == 0 : 
         print(i)
-        print(lsq[-1])
+        print("mean squared weights : {:.5f}".format(lsq[-1]))
+        print("loss : {:.5f}\n".format(l))
+
         
 # Plot of the loss
 fig, ax = plt.subplots()
@@ -166,6 +159,15 @@ ax.set_ylabel("Negative log-likelihood $\mathcal L$")
 ax.set_title("Loss during the training")
 
 plt.savefig("./thermal_images/loss_plot.png")
+
+fig, ax = plt.subplots()
+
+ax.scatter(lsq, loss, color = "black", zorder = 10)
+ax.grid()
+ax.set_ylabel("Loss $\mathcal L$")
+ax.set_xlabel("MSE")
+
+plt.savefig("./thermal_images/loss_MSE.png")
 
 # Comparison of the true and infered couplings
 dh = h_0 - h
