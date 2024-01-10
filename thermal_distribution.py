@@ -100,10 +100,10 @@ for i in range(n):
     j_0[:, i] = j[i, :]
 
 # Number of steps for the gradient descend
-m = int(2E3)
+m = int(4E3)
 
 # Learning rate a
-a = 0.3
+a = 0.2
 
 # Storage for the loss values
 loss = []
