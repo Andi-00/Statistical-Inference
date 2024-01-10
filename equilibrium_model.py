@@ -1,7 +1,8 @@
 import numpy as np
 
-s = np.genfromtxt("./bint.txt", delimiter = ",")
-s = np.reshape(s, (160, -1))
+print(283041 - 19 * 297 / 20E-3)
+s = np.genfromtxt("./bint.txt", delimiter = " ")
 
-s.shape
+s[s == 0] = -1
 
+print(s[:, 100])
