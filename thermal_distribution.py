@@ -140,7 +140,7 @@ for i in range(m):
 
     # Progress
     if i % 10 == 0 : 
-        print(i)
+        print("Gradient descend step {}".format(i))
         print("mean squared weights : {:.5f}".format(lsq[-1]))
         print("loss : {:.5f}\n".format(l))
 
@@ -158,7 +158,7 @@ ax.set_xlabel("Number of steps")
 ax.set_ylabel("Negative log-likelihood $\mathcal L$")
 ax.set_title("Loss during the training")
 
-plt.savefig("./thermal_images/loss_plot.png")
+plt.savefig("./Thermal_Images/loss_plot.png")
 
 fig, ax = plt.subplots()
 
@@ -167,7 +167,7 @@ ax.grid()
 ax.set_ylabel("Loss $\mathcal L$")
 ax.set_xlabel("MSE")
 
-plt.savefig("./thermal_images/loss_MSE.png")
+plt.savefig("./Thermal_Images/loss_MSE.png")
 
 # Comparison of the true and infered couplings
 dh = h_0 - h
@@ -201,6 +201,6 @@ ax.set_xlabel(r"Normalised Error $\Delta \theta / \sigma$")
 ax.set_ylabel("Number of counts")
 ax.set_title("Histogram of the Deviations")
 
-plt.savefig("./thermal_images/hisogram.png")
+plt.savefig("./Thermal_Images/hisogram.png")
 
 plt.show()

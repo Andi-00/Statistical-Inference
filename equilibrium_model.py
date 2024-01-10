@@ -1,8 +1,28 @@
 import numpy as np
+from matplotlib import pyplot as plt
+
+plt.rcParams['pgf.rcfonts'] = False
+plt.rcParams['font.serif'] = []
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['text.usetex'] = True
+plt.rcParams['axes.formatter.useoffset'] = False
+plt.rcParams['lines.linewidth'] = 2
+plt.rcParams['errorbar.capsize'] = 2
+plt.rcParams['grid.linewidth'] = 0.5
+plt.rcParams['axes.labelsize'] = 22
+plt.rcParams['axes.titlesize'] = 22
+plt.rcParams['xtick.labelsize'] = 18
+plt.rcParams['ytick.labelsize'] = 18
+plt.rcParams['legend.title_fontsize'] = 20
+plt.rcParams['legend.fontsize'] = 20
+plt.rcParams['savefig.dpi'] = 300
+plt.rcParams['savefig.bbox'] = 'tight'
+plt.rcParams['savefig.pad_inches'] = 0.1
+plt.rcParams['figure.figsize'] = (10, 7)
 
 # # Creating the mean of the spins and correlations to save them as a txt file
 # # This will reduce the time it takes to load the data
-# s = np.genfromtxt("./bint.txt", delimiter = " ")
+# s = np.genfromtxt("./Measurements/bint.txt", delimiter = " ")
 
 # s[s == 0] = -1
 
@@ -16,7 +36,114 @@ import numpy as np
 
 # mean_s = np.mean(s, axis = -1)
 
-# np.savetxt("./mean_spin.txt", mean_s, delimiter = " ")
-# np.savetxt("./mean_spin_correlation.txt", s2, delimiter = " ")
+# np.savetxt("./Measurements/magnetisation.txt", mean_s, delimiter = " ")
+# np.savetxt("./Measurements/correlation.txt", s2, delimiter = " ")
 
+# Set a random seed
+np.random.seed(3)
 
+# Number of spins
+n = 160
+
+# Generation of the couplings that we will later infere
+h = np.random.normal(0, 1, n)
+j = np.random.normal(0, 1 / n, (n, n))
+
+# We set the diagonal of j to zero and make it symmetric
+for i in range(n):
+    j[i, i] = 0
+    j[:, i] = j[i, :]
+
+# Energy difference between the new and old state (E' - E)
+dH = lambda k, s : 2 * s[k] * (h[k] + np.einsum("a, a ->", s, j[k]))
+
+# Function that performs N spin flips on the spins s with the couplings h and j
+def spin_flip(N, s):
+
+    # Spins to flip
+    k = np.random.randint(0, n, N)
+
+    # List that stores the different spin configurations
+    states = [s.copy()]
+
+    # Loop to flip the spins
+    for l in k:
+
+        # Computation of the energy difference
+        diff = dH(l, s, h, j)
+
+        # Conditions for a spin flip
+        if diff <= 0 : s[l] *= -1
+        elif np.random.rand() < np.exp(-diff) : s[l] *= -1
+
+        # A copy of the current spin configuration is saved in the states
+        states.append(s.copy())
+        
+    return states
+
+# Values of the measured magnetisation and correlation
+mean_s = np.genfromtxt("./Measurements/magnetisation.txt", delimiter = " ")
+mean_s2 = np.genfromtxt("./Measurements/correlation.txt", delimiter = " ")
+
+# Number of spin flips
+N = int(2E5)
+
+# Every n_sep-th configuration of the last n_train values is taken as train data
+n_sep = 5
+n_train = int(1E5)
+
+# Number of steps for the gradient descend
+m = int(5E3)
+
+# Learning rate a
+a = 0.2
+
+# Storage for the loss values
+loss = []
+
+# Loop for the gradient descend
+for i in range(m):
+
+    # Initialisation of the random spins
+    s_0 = np.random.randint(0, 2, n)
+    s_0[s_0 == 0] = -1
+
+    # MCMC algorithm for the spin flips of s_0
+    s_0 = spin_flip(N, s_0)
+    s_0 = s_0[- n_train :: n_sep]
+
+    # Computation of the correlations
+    s2_0 = np.einsum("ab, ac -> abc", s_0, s_0)
+
+    mean_s_0 = np.mean(s_0, axis = 0)
+    mean_s2_0 = np.mean(s2_0, axis = 0)
+
+    # Gradient descend update steps
+    h += a * (mean_s - mean_s_0)
+    j += a * (mean_s2 - mean_s2_0)
+ 
+    l = np.einsum("i, i ->", h, mean_s) + np.einsum("ij, ij ->", j, mean_s2) / 2
+    loss.append(-l)
+
+    # Progress
+    if i % 10 == 0 : 
+        print("Gradient descend step {}".format(i))
+        print("loss : {:.5f}\n".format(l))
+
+np.savetxt("./Weights/h_eq.txt", h, delimiter = " ")
+np.savetxt("./Weights/j_eq.txt", j, delimiter = " ")
+
+# Plot of the loss
+fig, ax = plt.subplots()
+
+x = np.arange(len(loss))
+
+ax.plot(x, loss, color = "black")
+ax.scatter(x, loss, color = "crimson", zorder = 10)
+
+ax.grid()
+ax.set_xlabel("Number of steps")
+ax.set_ylabel("Negative log-likelihood $\mathcal L$")
+ax.set_title("Loss during the training")
+
+plt.savefig("./Equilibrium_Images/loss_curve.png")
