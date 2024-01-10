@@ -100,7 +100,7 @@ for i in range(n):
     j_0[:, i] = j[i, :]
 
 # Number of steps for the gradient descend
-m = int(5E3)
+m = int(2E3)
 
 # Learning rate a
 a = 0.3
@@ -136,7 +136,7 @@ for i in range(m):
     lsq.append(np.mean(np.append(((h_0 - h) ** 2).flatten(), (((j_0 - j) * n) ** 2).flatten())))
  
     l = np.einsum("i, i ->", h_0, mean_s) + np.einsum("ij, ij ->", j_0, mean_s2) / 2
-    loss.append(l)
+    loss.append(-l)
 
     # Progress
     if i % 10 == 0 : 
