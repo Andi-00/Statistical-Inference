@@ -79,14 +79,12 @@ n_eq = int(500)
 
 N = int(n_train + n_eq)
 
-# Every n_sep-th configuration of the last n_train values is taken as train data
-n_sep = 5
-
 # Perform the spin flips on the spins s
 s = spin_flip(N, s, h, j)
 
 # Only the values in the thermal equilibrium are used to compute the averages
-s = s[- n_train :: n_sep]
+# Additionally we only save each n-th value for the update sweep
+s = s[- n_train :: n]
 
 # Computation of the correlations
 s2 = np.einsum("ab, ac -> abc", s, s)
@@ -125,7 +123,7 @@ for i in range(m):
 
     # MCMC algorithm for the spin flips of s_0
     s_0 = spin_flip(N, s_0, h_0, j_0)
-    s_0 = s_0[- n_train :: n_sep]
+    s_0 = s_0[- n_train :: n]
 
     # Computation of the correlations
     s2_0 = np.einsum("ab, ac -> abc", s_0, s_0)
