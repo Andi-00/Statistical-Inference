@@ -140,9 +140,6 @@ n_eq = int(2E4)
 
 N = int(n_train + n_eq)
 
-# Every n_sep-th configuration of the last n_train values is taken as train data
-n_sep = 5
-
 # Number of steps for the gradient descend
 m = int(3E3)
 
@@ -155,6 +152,10 @@ loss = [-np.einsum("i, i ->", h, mean_s) - np.einsum("ij, ij ->", j, mean_s2) / 
 # We will use this variable later to track the time
 start = time()
 
+# We store some of the weights and take the average of them at the end
+J_history = []
+H_history = []
+
 # Loop for the gradient descend
 for i in range(m):
 
@@ -163,8 +164,9 @@ for i in range(m):
     s_0[s_0 == 0] = -1
 
     # MCMC algorithm for the spin flips of s_0
+    # We only store every n-th value for the update sweep
     s_0 = spin_flip(N, s_0)
-    s_0 = s_0[- n_train :: n_sep]
+    s_0 = s_0[- n_train :: n]
 
     # Computation of the correlations
     s2_0 = np.einsum("ab, ac -> abc", s_0, s_0)
@@ -189,12 +191,22 @@ for i in range(m):
         print("Time / 10 steps: {:6.2f} s \n".format(end - start))
 
         start = time()
+
+    # After the 2000 step, we reduce the learninig rate and store the weights, starting at m = 3000
+    if m == 1500 : a = 0.2
+    if m > 2500 :
+        H_history.append(h)
+        J_history.append(j)
     
 
 # Saving the weights for later comparison of the results
 np.savetxt(dir + "Equilibrium Model/Loss & Weights/h_eq.txt", h, delimiter = " ")
 np.savetxt(dir + "Equilibrium Model/Loss & Weights/j_eq.txt", j, delimiter = " ")
 np.savetxt(dir + "Equilibrium Model/Loss & Weights/loss_eq.txt", loss, delimiter = " ")
+
+# We also store the history
+np.savetxt(dir + "Equilibrium Model/Loss & Weights/H_history_eq.txt", H_history, delimiter = " ")
+np.savetxt(dir + "Equilibrium Model/Loss & Weights/J_history_eq.txt", np.reshape(J_history, (160, -1)), delimiter = " ")
 
 # Plot of the loss
 fig, ax = plt.subplots()
