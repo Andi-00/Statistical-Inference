@@ -87,7 +87,7 @@ mean_s = np.genfromtxt("./Measurements/magnetisation.txt", delimiter = " ")
 mean_s2 = np.genfromtxt("./Measurements/correlation.txt", delimiter = " ")
 
 # Number of spin flips
-n_train = int(2E5)
+n_train = int(1E5)
 n_eq = int(2E4)
 
 N = int(n_train + n_eq)
