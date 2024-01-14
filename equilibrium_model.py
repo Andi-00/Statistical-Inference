@@ -41,14 +41,14 @@ plt.rcParams['figure.figsize'] = (10, 7)
 # np.savetxt("./Measurements/correlation.txt", s2, delimiter = " ")
 
 # Set a random seed
-np.random.seed(3)
+rng = np.random.default_rng(3)
 
 # Number of spins
 n = 160
 
 # Generation of the couplings that we will later infere
-h = np.random.normal(0, 1, n)
-j = np.random.normal(0, 1 / n, (n, n))
+h = rng.normal(0, 1, n)
+j = rng.normal(0, 1 / n, (n, n))
 
 # We set the diagonal of j to zero and make it symmetric
 for i in range(n):
@@ -62,7 +62,7 @@ dH = lambda k, s : 2 * s[k] * (h[k] + np.einsum("a, a ->", s, j[k]))
 def spin_flip(N, s):
 
     # Spins to flip
-    k = np.random.randint(0, n, N)
+    k = rng.integers(0, n, N)
 
     # List that stores the different spin configurations
     states = [s.copy()]
@@ -75,7 +75,7 @@ def spin_flip(N, s):
 
         # Conditions for a spin flip
         if diff <= 0 : s[l] *= -1
-        elif np.random.rand() < np.exp(-diff) : s[l] *= -1
+        elif rng.random() < np.exp(-diff) : s[l] *= -1
 
         # A copy of the current spin configuration is saved in the states
         states.append(s.copy())
@@ -111,7 +111,7 @@ start = time()
 for i in range(m):
 
     # Initialisation of the random spins
-    s_0 = np.random.randint(0, 2, n)
+    s_0 = rng.integers(0, 2, n)
     s_0[s_0 == 0] = -1
 
     # MCMC algorithm for the spin flips of s_0

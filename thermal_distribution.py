@@ -21,14 +21,14 @@ plt.rcParams['savefig.pad_inches'] = 0.1
 plt.rcParams['figure.figsize'] = (10, 7)
 
 # Set a random seed
-np.random.seed(3)
+rng = np.random.default_rng()
 
 # Number of spins
 n = 5
 
 # Generation of the couplings
-h = np.random.normal(0, 1, n)
-j = np.random.normal(0, 1 / n, (n, n))
+h = rng.normal(0, 1, n)
+j = rng.normal(0, 1 / n, (n, n))
 
 # We set the diagonal of j to zero and make it symmetric
 for i in range(n):
@@ -36,7 +36,7 @@ for i in range(n):
     j[:, i] = j[i, :]
 
 # Setup the spins
-s = np.random.randint(0, 2, n)
+s = rng.integers(0, 2, n)
 s[s == 0] = -1
 
 # Calculation of the energy
@@ -49,7 +49,7 @@ dH = lambda k, s, h, j : 2 * s[k] * (h[k] + np.einsum("a, a ->", s, j[k]))
 def spin_flip(N, s, h, j):
 
     # Spins to flip
-    k = np.random.randint(0, n, N)
+    k = rng.integers(0, n, N)
 
     # List that stores the different spin configurations
     states = [s.copy()]
@@ -62,7 +62,7 @@ def spin_flip(N, s, h, j):
 
         # Conditions for a spin flip
         if diff <= 0 : s[l] *= -1
-        elif np.random.rand() < np.exp(-diff) : s[l] *= -1
+        elif rng.random() < np.exp(-diff) : s[l] *= -1
 
         # A copy of the current spin configuration is saved in the states
         states.append(s.copy())
@@ -94,8 +94,8 @@ mean_s2 = np.mean(s2, axis = 0)
 
 # We are now going to infer the parameters h and j
 # For that we first initialise some random values for h_0 and j_0
-h_0 = np.random.normal(0, 1, n)
-j_0 = np.random.normal(0, 1 / n, (n, n))
+h_0 = rng.normal(0, 1, n)
+j_0 = rng.normal(0, 1 / n, (n, n))
 
 for i in range(n):
     j_0[i, i] = 0
@@ -117,7 +117,7 @@ lsq = []
 for i in range(m):
 
     # Initialisation of the random spins
-    s_0 = np.random.randint(0, 2, n)
+    s_0 = rng.integers(0, 2, n)
     s_0[s_0 == 0] = -1
 
     # MCMC algorithm for the spin flips of s_0
