@@ -21,34 +21,40 @@ plt.rcParams['savefig.bbox'] = 'tight'
 plt.rcParams['savefig.pad_inches'] = 0.1
 plt.rcParams['figure.figsize'] = (10, 7)
 
+# Directory of the current folder
+dir = "2. Salamander Brain/"
 
+
+# # Data Preperation
 
 # # Splitting the data into test and train data and
-# # Computing the different means and storing them in "./Measurements" to reduce the program time for later
-# s = np.genfromtxt("./Measurements/bint.txt", delimiter = " ")
+# # Computing the different means and storing them to reduce the computational effort for later
+# s = np.genfromtxt(dir + "Measurements/bint.txt", delimiter = " ")
 
 # # Set a random seed
 # rng = np.random.default_rng(3)
 
-# print(s.shape)
-
+# # Replacing the zeros with -1
 # s[s == 0] = -1
 
+# # Shuffelling the list for the seperation in test and train data
 # rng.shuffle(s, axis = -1)
 
 # # Train / Test = 80% / 20%
 # t = int(0.8 * s.shape[-1])
 
 # # Train and Test Set
-# s_train = s[:t]
-# s_test = s[t:]
+# s_train = s[:, :t]
+# s_test = s[:, t:]
 
+# # Correlation of two and three spins
 # s2_train = np.zeros((160, 160))
 # s2_test = np.zeros((160, 160))
 
 # s3_train = np.zeros((160, 160, 160))
 # s3_test = np.zeros((160, 160, 160))
 
+# # Loop to compute the correlations
 # for i in range(160):
 #     print(i)
 #     for j in range(i + 1):
@@ -62,20 +68,25 @@ plt.rcParams['figure.figsize'] = (10, 7)
 #             s3_train[i, j, k] = np.mean(s[i, :] * s[j, :] * s[k, :])
 #             s3_test[i, j, k] = np.mean(s[i, :] * s[j, :] * s[k, :])
 
-
+# # Mean of the single spins
 # s_train = np.mean(s_train, axis = -1)
 # s_test = np.mean(s_test, axis = -1)
 
+# # Reshaping the tripple spin interactions to store them in a txt file
 # s3_train = s3_train.reshape((160, -1))
 # s3_test = s3_test.reshape((160, -1))
 
-# np.savetxt("./Measurements/Equilibrium/s_train.txt", s_train, delimiter = " ")
-# np.savetxt("./Measurements/Equilibrium/s2_train.txt", s2_train, delimiter = " ")
-# np.savetxt("./Measurements/Equilibrium/s3_train.txt", s3_train, delimiter = " ")
+# # Saving the results
+# np.savetxt(dir + "Measurements/Equilibrium/s_train.txt", s_train, delimiter = " ")
+# np.savetxt(dir + "Measurements/Equilibrium/s2_train.txt", s2_train, delimiter = " ")
+# np.savetxt(dir + "Measurements/Equilibrium/s3_train.txt", s3_train, delimiter = " ")
 
-# np.savetxt("./Measurements/Equilibrium/s_test.txt", s_test, delimiter = " ")
-# np.savetxt("./Measurements/Equilibrium/s2_test.txt", s2_test, delimiter = " ")
-# np.savetxt("./Measurements/Equilibrium/s3_test.txt", s3_test, delimiter = " ")
+# np.savetxt(dir + "Measurements/Equilibrium/s_test.txt", s_test, delimiter = " ")
+# np.savetxt(dir + "Measurements/Equilibrium/s2_test.txt", s2_test, delimiter = " ")
+# np.savetxt(dir + "Measurements/Equilibrium/s3_test.txt", s3_test, delimiter = " ")
+
+
+# Start of the real task
 
 # Set a random seed
 rng = np.random.default_rng(3)
@@ -120,8 +131,8 @@ def spin_flip(N, s):
     return states
 
 # Values of the measured magnetisation and correlation
-mean_s = np.genfromtxt("./Measurements/Equilibrium/s_train.txt", delimiter = " ")
-mean_s2 = np.genfromtxt("./Measurements/Equilibrium/s2_train.txt", delimiter = " ")
+mean_s = np.genfromtxt(dir + "Measurements/Equilibrium/s_train.txt", delimiter = " ")
+mean_s2 = np.genfromtxt(dir + "Measurements/Equilibrium/s2_train.txt", delimiter = " ")
 
 # Number of spin flips
 n_train = int(1E5)
@@ -133,7 +144,7 @@ N = int(n_train + n_eq)
 n_sep = 5
 
 # Number of steps for the gradient descend
-m = int(2E3)
+m = int(3E3)
 
 # Learning rate a
 a = 0.4
@@ -181,9 +192,9 @@ for i in range(m):
     
 
 # Saving the weights for later comparison of the results
-np.savetxt("./Loss & Weights/h_eq.txt", h, delimiter = " ")
-np.savetxt("./Loss & Weights/j_eq.txt", j, delimiter = " ")
-np.savetxt("./Loss & Weights/loss_eq.txt", loss, delimiter = " ")
+np.savetxt(dir + "Equilibrium Model/Loss & Weights/h_eq.txt", h, delimiter = " ")
+np.savetxt(dir + "Equilibrium Model/Loss & Weights/j_eq.txt", j, delimiter = " ")
+np.savetxt(dir + "Equilibrium Model/Loss & Weights/loss_eq.txt", loss, delimiter = " ")
 
 # Plot of the loss
 fig, ax = plt.subplots()
@@ -198,4 +209,4 @@ ax.set_xlabel("Number of steps")
 ax.set_ylabel("Negative log-likelihood $\mathcal L$")
 ax.set_title("Loss during the training")
 
-plt.savefig("./Equilibrium_Images/train_loss_curve.png")
+plt.savefig(dir + "Equilibrium Model/Figures/train_loss_curve.png")

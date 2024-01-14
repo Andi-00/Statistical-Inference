@@ -20,6 +20,9 @@ plt.rcParams['savefig.bbox'] = 'tight'
 plt.rcParams['savefig.pad_inches'] = 0.1
 plt.rcParams['figure.figsize'] = (10, 7)
 
+# Directory of the current folder
+dir = "./1. Warm Up - Thermal Distributions/"
+
 # Set a random seed
 rng = np.random.default_rng()
 
@@ -160,7 +163,7 @@ ax.set_xlabel("Number of steps")
 ax.set_ylabel("Negative log-likelihood $\mathcal L$")
 ax.set_title("Loss during the training")
 
-plt.savefig("./Thermal_Images/loss_plot_2.png")
+plt.savefig(dir + "Figures/loss_plot_2.png")
 
 fig, ax = plt.subplots()
 
@@ -169,7 +172,7 @@ ax.grid()
 ax.set_ylabel("Loss $\mathcal L$")
 ax.set_xlabel("MSE")
 
-plt.savefig("./Thermal_Images/loss_MSE_2.png")
+plt.savefig(dir + "Figures/loss_MSE_2.png")
 
 # Comparison of the true and infered couplings
 dh = h_0 - h
@@ -203,6 +206,6 @@ ax.set_xlabel(r"Normalised Error $\Delta \theta / \sigma$")
 ax.set_ylabel("Number of counts")
 ax.set_title("Histogram of the Deviations")
 
-plt.savefig("./Thermal_Images/hisogram_2.png")
+plt.savefig(dir + "Figures/hisogram_2.png")
 
 plt.show()
