@@ -71,11 +71,13 @@ def spin_flip(N, s, h, j):
     
 
 # Number of spin flips
-N = int(2E4)
+n_train = int(1E4)
+n_eq = int(500)
+
+N = int(n_train + n_eq)
 
 # Every n_sep-th configuration of the last n_train values is taken as train data
 n_sep = 5
-n_train = int(1E4)
 
 # Perform the spin flips on the spins s
 s = spin_flip(N, s, h, j)
@@ -100,7 +102,7 @@ for i in range(n):
     j_0[:, i] = j[i, :]
 
 # Number of steps for the gradient descend
-m = int(4E3)
+m = int(2E3)
 
 # Learning rate a
 a = 0.2
@@ -142,7 +144,7 @@ for i in range(m):
     if i % 10 == 0 : 
         print("Gradient descend step {}".format(i))
         print("mean squared weights : {:.5f}".format(lsq[-1]))
-        print("loss : {:.5f}\n".format(l))
+        print("loss : {:.5f}\n".format(-l))
 
         
 # Plot of the loss
@@ -158,7 +160,7 @@ ax.set_xlabel("Number of steps")
 ax.set_ylabel("Negative log-likelihood $\mathcal L$")
 ax.set_title("Loss during the training")
 
-plt.savefig("./Thermal_Images/loss_plot.png")
+plt.savefig("./Thermal_Images/loss_plot_2.png")
 
 fig, ax = plt.subplots()
 
@@ -167,7 +169,7 @@ ax.grid()
 ax.set_ylabel("Loss $\mathcal L$")
 ax.set_xlabel("MSE")
 
-plt.savefig("./Thermal_Images/loss_MSE.png")
+plt.savefig("./Thermal_Images/loss_MSE_2.png")
 
 # Comparison of the true and infered couplings
 dh = h_0 - h
@@ -201,6 +203,6 @@ ax.set_xlabel(r"Normalised Error $\Delta \theta / \sigma$")
 ax.set_ylabel("Number of counts")
 ax.set_title("Histogram of the Deviations")
 
-plt.savefig("./Thermal_Images/hisogram.png")
+plt.savefig("./Thermal_Images/hisogram_2.png")
 
 plt.show()

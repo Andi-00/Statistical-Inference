@@ -87,20 +87,22 @@ mean_s = np.genfromtxt("./Measurements/magnetisation.txt", delimiter = " ")
 mean_s2 = np.genfromtxt("./Measurements/correlation.txt", delimiter = " ")
 
 # Number of spin flips
-N = int(2E5)
+n_train = int(2E5)
+n_eq = int(2E4)
+
+N = int(n_train + n_eq)
 
 # Every n_sep-th configuration of the last n_train values is taken as train data
 n_sep = 5
-n_train = int(1E5)
 
 # Number of steps for the gradient descend
-m = int(5E3)
+m = int(2E3)
 
 # Learning rate a
-a = 0.2
+a = 0.4
 
-# Storage for the loss values
-loss = []
+# Storage for the loss values with the initial value
+loss = [-np.einsum("i, i ->", h, mean_s) - np.einsum("ij, ij ->", j, mean_s2) / 2]
 
 # We will use this variable later to track the time
 start = time()
@@ -135,11 +137,10 @@ for i in range(m):
         end = time()
 
         print("Gradient descend step {}".format(i))
-        print("Loss value     : {:.3f}".format(l))
+        print("Loss value     : {:.3f}".format(-l))
         print("Time / 10 steps: {:6.2f} s \n".format(end - start))
 
         start = time()
-    
     
 
 # Saving the weights for later comparison of the results
@@ -160,4 +161,4 @@ ax.set_xlabel("Number of steps")
 ax.set_ylabel("Negative log-likelihood $\mathcal L$")
 ax.set_title("Loss during the training")
 
-plt.savefig("./Equilibrium_Images/loss_curve.png")
+plt.savefig("./Equilibrium_Images/loss_curve_test.png")
