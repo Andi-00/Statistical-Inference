@@ -192,13 +192,10 @@ for i in range(m):
 
         start = time()
 
-    # After the 2000 step, we reduce the learninig rate and store the weights, starting at m = 3000
-    if m == 1500 : a = 0.2
-    if m > 2500 :
-        H_history.append(h)
-        J_history.append(j)
+    # We save the history of the couplings h and j
+    H_history.append(h)
+    J_history.append(j)
     
-
 # Saving the weights for later comparison of the results
 np.savetxt(dir + "Equilibrium Model/Loss & Weights/h_eq.txt", h, delimiter = " ")
 np.savetxt(dir + "Equilibrium Model/Loss & Weights/j_eq.txt", j, delimiter = " ")
