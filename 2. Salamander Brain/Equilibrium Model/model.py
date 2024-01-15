@@ -192,9 +192,13 @@ for i in range(m):
 
         start = time()
 
-    # We save the history of the couplings h and j
-    H_history.append(h)
-    J_history.append(j)
+    # We save the last n_hist values of the couplings h and j
+        
+    n_hist = 100
+
+    if i > m - n_hist:
+        H_history.append(h)
+        J_history.append(j)
     
 # Saving the weights for later comparison of the results
 np.savetxt(dir + "Equilibrium Model/Loss & Weights/h_eq.txt", h, delimiter = " ")
@@ -203,7 +207,7 @@ np.savetxt(dir + "Equilibrium Model/Loss & Weights/loss_eq.txt", loss, delimiter
 
 # We also store the history
 np.savetxt(dir + "Equilibrium Model/Loss & Weights/H_history_eq.txt", H_history, delimiter = " ")
-np.savetxt(dir + "Equilibrium Model/Loss & Weights/J_history_eq.txt", np.reshape(J_history, (160, -1)), delimiter = " ")
+np.savetxt(dir + "Equilibrium Model/Loss & Weights/J_history_eq.txt", np.reshape(J_history, (n_hist, -1)), delimiter = " ")
 
 # Plot of the loss
 fig, ax = plt.subplots()
