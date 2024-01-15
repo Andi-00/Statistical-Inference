@@ -150,6 +150,7 @@ ax.set_ylabel(r"Normalised Number of Counts $n/n_\mathrm{total}$")
 
 plt.savefig(dir + "Equilibrium Model/Figures/s3_histogram.png")
 
+# Hist of the test s3
 s3_test = s3_test.flatten()
 weights = np.ones(len(s3_test)) / len(s3_test)
 
