@@ -27,8 +27,8 @@ dir = "./2. Salamander Brain/"
 n = 160
 
 # We first read in our infered model weights
-h = np.genfromtxt(dir + "2.2 Equilibrium Model/Loss & Weights/H_history_eq.txt", delimiter = " ")
-j = np.genfromtxt(dir + "2.2 Equilibrium Model/Loss & Weights/J_history_eq.txt", delimiter = " ")
+h = np.genfromtxt(dir + "2.1 Equilibrium Model/Loss & Weights/H_history_eq.txt", delimiter = " ")
+j = np.genfromtxt(dir + "2.1 Equilibrium Model/Loss & Weights/J_history_eq.txt", delimiter = " ")
 
 h = np.mean(h, axis = 0)
 
@@ -53,7 +53,7 @@ print(train_loss)
 print(test_loss)
 
 # Loss during the training
-l = np.genfromtxt(dir + "2.2 Equilibrium Model/Loss & Weights/loss_eq.txt", delimiter = " ")
+l = np.genfromtxt(dir + "2.1 Equilibrium Model/Loss & Weights/loss_eq.txt", delimiter = " ")
 x = np.arange(len(l))
 
 # Plot of the loss during the training
@@ -73,7 +73,7 @@ ax.grid()
 ax.set_ylabel("Loss Value $\mathcal L$")
 ax.set_xlabel("Training Iteration Number")
 
-plt.savefig(dir + "2.2 Equilibrium Model/Figures/loss_plot.png")
+plt.savefig(dir + "2.1 Equilibrium Model/Figures/loss_plot.png")
 
 
 # Computation of the 3-spin-correlation. For that we again have to simulate spin flips
@@ -148,7 +148,7 @@ ax.grid()
 ax.set_xlabel(r"$\langle s_i s_j s_k \rangle_\theta - \langle s_i s_j s_k \rangle_\mathrm{data}$")
 ax.set_ylabel(r"Normalised Number of Counts $n/n_\mathrm{total}$")
 
-plt.savefig(dir + "2.2 Equilibrium Model/Figures/s3_histogram.png")
+plt.savefig(dir + "2.1 Equilibrium Model/Figures/s3_histogram.png")
 
 # Hist of the test s3
 s3_test = s3_test.flatten()
@@ -161,6 +161,6 @@ ax.grid()
 ax.set_xlabel(r"$\langle s_i s_j s_k \rangle_\mathrm{data}$")
 ax.set_ylabel(r"Normalised Number of Counts $n/n_\mathrm{total}$")
 
-plt.savefig(dir + "2.2 Equilibrium Model/Figures/s3_test_histogram.png")
+plt.savefig(dir + "2.1 Equilibrium Model/Figures/s3_test_histogram.png")
 
 plt.show()

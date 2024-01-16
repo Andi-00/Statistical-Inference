@@ -201,13 +201,13 @@ for i in range(m):
         J_history.append(j)
     
 # Saving the weights for later comparison of the results
-np.savetxt(dir + "2.2 Equilibrium Model/Loss & Weights/h_eq.txt", h, delimiter = " ")
-np.savetxt(dir + "2.2 Equilibrium Model/Loss & Weights/j_eq.txt", j, delimiter = " ")
-np.savetxt(dir + "2.2 Equilibrium Model/Loss & Weights/loss_eq.txt", loss, delimiter = " ")
+np.savetxt(dir + "2.1 Equilibrium Model/Loss & Weights/h_eq.txt", h, delimiter = " ")
+np.savetxt(dir + "2.1 Equilibrium Model/Loss & Weights/j_eq.txt", j, delimiter = " ")
+np.savetxt(dir + "2.1 Equilibrium Model/Loss & Weights/loss_eq.txt", loss, delimiter = " ")
 
 # We also store the history
-np.savetxt(dir + "2.2 Equilibrium Model/Loss & Weights/H_history_eq.txt", H_history, delimiter = " ")
-np.savetxt(dir + "2.2 Equilibrium Model/Loss & Weights/J_history_eq.txt", np.reshape(J_history, (n_hist, -1)), delimiter = " ")
+np.savetxt(dir + "2.1 Equilibrium Model/Loss & Weights/H_history_eq.txt", H_history, delimiter = " ")
+np.savetxt(dir + "2.1 Equilibrium Model/Loss & Weights/J_history_eq.txt", np.reshape(J_history, (n_hist, -1)), delimiter = " ")
 
 # Plot of the loss
 fig, ax = plt.subplots()
@@ -222,4 +222,4 @@ ax.set_xlabel("Number of steps")
 ax.set_ylabel("Negative log-likelihood $\mathcal L$")
 ax.set_title("Loss during the training")
 
-plt.savefig(dir + "2.2 Equilibrium Model/Figures/train_loss_curve.png")
+plt.savefig(dir + "2.1 Equilibrium Model/Figures/train_loss_curve.png")
