@@ -68,13 +68,12 @@ if symmetric:
         j[i, i] = 0
         j[:, i] = j[i, :]
 
-
-s0 = s_train[:-1]
-s1 = s_train[1:]
+s0 = s_train[:, :-1]
+s1 = s_train[:, 1:]
 
 # Loss computation for the first round
-theta = np.einsum("ij, nj -> ni", j, s0) + np.reshape(h, (1, -1))
-loss = [np.mean(np.sum(s1 * theta - np.log(2 * np.cosh(theta)), axis = -1))]
+theta = np.einsum("ij, jn -> in", j, s0) + np.reshape(h, (-1, 1))
+loss = [np.mean(np.sum(s1 * theta - np.log(2 * np.cosh(theta)), axis = 0))]
 
 # We will use this variable later to track the time
 start = time()
@@ -89,15 +88,21 @@ m = int(3E3)
 # Learning rate
 a = 0.4
 
+dj = np.zeros((n, n))
+
 # Trinaing loop
 for i in range(m):
 
     # Computation of theta for the gradients
-    theta = np.einsum("ij, nj -> ni", j, s0) + h
+    theta = np.einsum("ij, jn -> in", j, s0) + np.reshape(h, (-1, 1))
     
     # Computation of the updates 
-    dh = np.mean(s1, axis = 0) - np.mean(np.tanh(theta), axis = 0)
-    dj = np.mean(np.einsum("ni, nj -> nij", s1, s0), axis = 0) - np.mean(np.einsum("ni, nj -> nij", np.tanh(theta), s0), axis = 0)
+    dh = np.mean(s1, axis = -1) - np.mean(np.tanh(theta), axis = -1)
+    # dj = np.mean(np.einsum("in, jn -> nij", s1, s0), axis = 0) - np.mean(np.einsum("in, jn -> nij", np.tanh(theta), s0), axis = 0)
+
+    for i in range(n):
+        for j in range(n):
+            dj[i, j] = np.mean(s1[i] * s0[j]) - np.mean(np.tanh(theta[i]) * s0[j])
 
     # Gradient descend update steps
     h += a * dh
@@ -113,7 +118,7 @@ for i in range(m):
         end = time()
 
         print("Gradient descend step {}".format(i))
-        print("Loss value     : {:.4f}".format(-l))
+        print("Loss value     : {:.4f}".format(l))
         print("Time / 10 steps: {:6.2f} s \n".format(end - start))
 
         start = time()
