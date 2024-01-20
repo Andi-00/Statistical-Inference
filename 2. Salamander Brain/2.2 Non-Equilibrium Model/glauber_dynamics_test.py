@@ -34,9 +34,10 @@ n = 5
 h = rng.normal(0, 1, n)
 j = rng.normal(0, 1 / n, (n, n))
 
-# We set the diagonal of j to zero
+# We set the diagonal of j to zero and make it symmetric
 for i in range(n):
     j[i, i] = 0
+    j[:, i] = j[i, :]
 
 # Setup the spins
 s = rng.integers(0, 2, n)
@@ -100,7 +101,8 @@ s1 = s[1:].copy()
 theta = np.einsum("ij, nj -> ni", j_0, s0) + np.reshape(h_0, (1, -1))
 loss = [np.mean(np.sum(s1 * theta - np.log(2 * np.cosh(theta)), axis = -1))]
 
-lsq = [np.mean(np.append(((h_0 - h) ** 2).flatten(), (((j_0 - j) * n) ** 2).flatten()))]
+error = np.append((h_0 - h) ** 2, ((j_0 - j) * n) ** 2) 
+lsq = [np.mean(error)]
 
 # We will use this variable later to track the time
 start = time()
@@ -109,11 +111,18 @@ start = time()
 j_hist = []
 h_hist = []
 
+print(s1.shape)
+print(j_0.shape)
+
+print(np.einsum("ij, nj -> ni", j_0, s0).shape)
+
 # Trinaing loop
 for i in range(m):
 
-    theta = np.einsum("ij, nj -> ni", j_0, s0) + np.reshape(h_0, (1, -1))
+    # Computation of theta for the gradients
+    theta = np.einsum("ij, nj -> ni", j_0, s0) + h_0
     
+    # Computation of the updates 
     dh = np.mean(s1, axis = 0) - np.mean(np.tanh(theta), axis = 0)
     dj = np.mean(np.einsum("ni, nj -> nij", s1, s0), axis = 0) - np.mean(np.einsum("ni, nj -> nij", np.tanh(theta), s0), axis = 0)
 
@@ -121,11 +130,13 @@ for i in range(m):
     h_0 += a * dh
     j_0 += a * dj
 
+    # Loss function
     l = np.mean(np.sum(s1 * theta - np.log(2 * np.cosh(theta)), axis = -1))
     loss.append(l)
 
     # MSE of the weights
-    lsq.append(np.mean(np.append(((h_0 - h) ** 2).flatten(), (((j_0 - j) * n) ** 2).flatten())))
+    error = np.append((h_0 - h) ** 2, ((j_0 - j) * n) ** 2) 
+    lsq.append(np.mean(error))
 
     # Progress
     if i % 10 == 0 : 
@@ -138,20 +149,26 @@ for i in range(m):
 
         start = time()
 
+    # We store the last 50 weights and do an average
     if i > m - 50:
         h_hist.append(h_0)
         j_hist.append(j_0)
 
+# Final weight values
 h_0 = np.mean(h_hist, axis = 0)
 j_0 = np.mean(j_hist, axis = 0)
 
+# Final loss value computation
 theta = np.einsum("ij, nj -> ni", j_0, s0) + np.reshape(h_0, (1, -1))
 loss.append(np.mean(np.sum(s1 * theta - np.log(2 * np.cosh(theta)), axis = -1)))
 
-lsq.append(np.mean(np.append(((h_0 - h) ** 2).flatten(), (((j_0 - j) * n) ** 2).flatten())))
+# Least squared error of the weights
+error = np.append((h_0 - h) ** 2, ((j_0 - j) * n) ** 2) 
+lsq.append(np.mean(error))
 
 # Negative log likelihood
 loss = - np.array(loss)
+
 
 # Plot of the loss
 fig, ax = plt.subplots()
@@ -168,9 +185,10 @@ ax.set_title("Loss during the training")
 
 # plt.savefig(dir + "Figures/loss_plot_2.png")
 
+# Plot if the MSE vs Loss
 fig, ax = plt.subplots()
 
-ax.scatter(np.arange(len(lsq)), lsq, color = "black", zorder = 10)
+ax.scatter(lsq, loss, color = "black", zorder = 10)
 ax.grid()
 ax.set_ylabel("Loss $\mathcal L$")
 ax.set_xlabel("MSE")
@@ -188,9 +206,6 @@ for i in range(n):
 
 dj = np.array(temp)
 
-print(np.mean(dj))
-print(np.std(dj, ddof = 1))
-
 # print(h)
 # print(h_0)
 # print(j)
@@ -200,6 +215,8 @@ print(np.std(dj, ddof = 1))
 fig, ax = plt.subplots()
 
 errors = np.append(dh.flatten(), dj.flatten())
+
+print(np.mean(errors ** 2))
 
 b = np.arange(-1, 1.12, 0.1) - 0.05
 
