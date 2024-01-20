@@ -100,7 +100,7 @@ j_0 = rng.normal(0, 1 / n, (n, n))
 
 for i in range(n):
     j_0[i, i] = 0
-    j_0[:, i] = j[i, :]
+    j_0[:, i] = j_0[i, :]
 
 # Number of steps for the gradient descend
 m = int(2E3)
