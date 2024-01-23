@@ -52,6 +52,18 @@ test_loss = -np.einsum("i, i ->", h, s_test) - np.einsum("ij, ij ->", j, s2_test
 print(train_loss)
 print(test_loss)
 
+# Plots of the train, test correlations
+# fig, ax = plt.subplots()
+
+# ax.scatter(s_train, s_test, color = "black", label = r"$s_i$")
+# ax.scatter(s2_train, s2_test, color = "crimson", label = r"$s_i s_j$")
+# ax.scatter(s3_train, s3_test, color = "royalblue", label = r"$s_i s_j s_k$")
+
+# ax.grid()
+# ax.legend()
+
+# plt.show()
+
 # Loss during the training
 l = np.genfromtxt(dir + "2.1 Equilibrium Model/Loss & Weights/loss_eq.txt", delimiter = " ")
 x = np.arange(len(l))
@@ -112,7 +124,7 @@ rng = np.random.default_rng(3)
 s = rng.integers(0, 2, n)
 s[s == 0] = -1
 
-n_train = int(1E5)
+n_train = int(1E6)
 n_eq = int(2E4)
 
 N = int(n_train + n_eq)
@@ -176,7 +188,7 @@ s = np.mean(s, axis = 0)
 # Plot of the magnetisation
 fig, ax = plt.subplots()
 
-ax.scatter(s_test, s, color = "crimson", zorder = 10)
+ax.scatter(s_train, s, color = "crimson", zorder = 10)
 ax.grid()
 
 ax.set_ylabel(r"$\langle s_i \rangle_\theta$")
@@ -187,7 +199,7 @@ plt.savefig(dir + "2.1 Equilibrium Model/Figures/scatter_s.png")
 # Plot of the correlations
 fig, ax = plt.subplots()
 
-ax.scatter(s2_test, s2, color = "crimson", zorder = 10)
+ax.scatter(s2_train, s2, color = "crimson", zorder = 10)
 ax.grid()
 
 ax.set_ylabel(r"$\langle s_i s_j\rangle_\theta$")
@@ -198,7 +210,7 @@ plt.savefig(dir + "2.1 Equilibrium Model/Figures/scatter_s2.png")
 # Plot of the 3 spin correlations
 fig, ax = plt.subplots()
 
-ax.scatter(s3_test, s3, color = "crimson", zorder = 10)
+ax.scatter(s3_train, s3, color = "crimson", zorder = 10)
 ax.grid()
 
 ax.set_ylabel(r"$\langle s_i s_j s_k\rangle_\theta$")
