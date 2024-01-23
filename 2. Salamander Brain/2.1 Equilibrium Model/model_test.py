@@ -163,4 +163,48 @@ ax.set_ylabel(r"Normalised Number of Counts $n/n_\mathrm{total}$")
 
 plt.savefig(dir + "2.1 Equilibrium Model/Figures/s3_test_histogram.png")
 
+# Correlation Scatter Plots
+
+s2 = np.zeros((n, n))
+
+for i in range(n):
+    for j in range(i + 1):
+        s2[i, j] = np.mean(s[:, i] * s[:, j])
+
+s = np.mean(s, axis = 0)
+
+# Plot of the magnetisation
+fig, ax = plt.subplots()
+
+ax.scatter(s_test, s, color = "crimson", zorder = 10)
+ax.grid()
+
+ax.set_ylabel(r"$\langle s_i \rangle_\theta$")
+ax.set_xlabel(r"$\langle s_i \rangle_\mathrm{data}$")
+
+plt.savefig(dir + "2.1 Equilibrium Model/Figures/scatter_s.png")
+
+# Plot of the correlations
+fig, ax = plt.subplots()
+
+ax.scatter(s2_test, s2, color = "crimson", zorder = 10)
+ax.grid()
+
+ax.set_ylabel(r"$\langle s_i s_j\rangle_\theta$")
+ax.set_xlabel(r"$\langle s_i s_j\rangle_\mathrm{data}$")
+
+plt.savefig(dir + "2.1 Equilibrium Model/Figures/scatter_s2.png")
+
+# Plot of the 3 spin correlations
+fig, ax = plt.subplots()
+
+ax.scatter(s3_test, s3, color = "crimson", zorder = 10)
+ax.grid()
+
+ax.set_ylabel(r"$\langle s_i s_j s_k\rangle_\theta$")
+ax.set_xlabel(r"$\langle s_i s_j s_k\rangle_\mathrm{data}$")
+
+plt.savefig(dir + "2.1 Equilibrium Model/Figures/scatter_s3.png")
+
+
 plt.show()
