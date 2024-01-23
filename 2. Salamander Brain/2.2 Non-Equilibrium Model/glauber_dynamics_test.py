@@ -22,7 +22,7 @@ plt.rcParams['savefig.pad_inches'] = 0.1
 plt.rcParams['figure.figsize'] = (10, 7)
 
 # Directory of the current folder
-dir = "./2. Salamander Brain/"
+dir = "./2. Salamander Brain/2.2 Non-Equilibrium Model/"
 
 # Set a random seed
 rng = np.random.default_rng(3)
@@ -116,7 +116,7 @@ print(j_0.shape)
 
 print(np.einsum("ij, nj -> ni", j_0, s0).shape)
 
-# Trinaing loop
+# Training loop
 for i in range(m):
 
     # Computation of theta for the gradients
@@ -144,7 +144,7 @@ for i in range(m):
         end = time()
 
         print("Gradient descend step {}".format(i))
-        print("Loss value     : {:.4f}".format(-l))
+        print("Loss value     : {:.4f}".format(l))
         print("Time / 10 steps: {:6.2f} s \n".format(end - start))
 
         start = time()
@@ -166,8 +166,8 @@ loss.append(np.mean(np.sum(s1 * theta - np.log(2 * np.cosh(theta)), axis = -1)))
 error = np.append((h_0 - h) ** 2, ((j_0 - j) * n) ** 2) 
 lsq.append(np.mean(error))
 
-# Negative log likelihood
-loss = - np.array(loss)
+# log likelihood
+loss = np.array(loss)
 
 
 # Plot of the loss
@@ -180,10 +180,10 @@ ax.scatter(x, loss, color = "crimson", zorder = 10)
 
 ax.grid()
 ax.set_xlabel("Number of steps")
-ax.set_ylabel("Negative log-likelihood $\mathcal L$")
+ax.set_ylabel(r"log-likelihood $\mathcal L = \ln P(s(t +1)|s(t))$")
 ax.set_title("Loss during the training")
 
-# plt.savefig(dir + "Figures/loss_plot_2.png")
+plt.savefig(dir + "Figures/test_loss_plot.png")
 
 # Plot if the MSE vs Loss
 fig, ax = plt.subplots()
@@ -193,27 +193,29 @@ ax.grid()
 ax.set_ylabel("Loss $\mathcal L$")
 ax.set_xlabel("MSE")
 
+plt.savefig(dir + "Figures/test_loss_MSE.png")
 
 # Comparison of the true and infered couplings
 dh = h_0 - h
 dj = (j_0 - j) * n
 
-temp = []
+# temp = []
 
-for i in range(n):
-    for k in range(i):
-        temp.append(dj[i, k])
+# for i in range(n):
+#     for k in range(i):
+#         temp.append(dj[i, k])
 
-dj = np.array(temp)
+# dj = np.array(temp)
 
-# print(h)
+print(h_0 - h)
 # print(h_0)
-# print(j)
+print(j_0 - j)
 # print(j_0)
 
 # Plot of the histogram
 fig, ax = plt.subplots()
 
+# errors = dj.flatten()
 errors = np.append(dh.flatten(), dj.flatten())
 
 print(np.mean(errors ** 2))
@@ -227,6 +229,6 @@ ax.set_xlabel(r"Normalised Error $\Delta \theta / \sigma$")
 ax.set_ylabel("Number of counts")
 ax.set_title("Histogram of the Deviations")
 
-# plt.savefig(dir + "Figures/hisogram_2.png")
+plt.savefig(dir + "Figures/histogram_2.png")
 
 plt.show()
