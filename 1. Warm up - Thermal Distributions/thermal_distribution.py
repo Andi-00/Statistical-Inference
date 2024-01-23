@@ -103,7 +103,7 @@ for i in range(n):
     j_0[:, i] = j_0[i, :]
 
 # Number of steps for the gradient descend
-m = int(2E3)
+m = int(1E3)
 
 # Learning rate a
 a = 0.2
@@ -113,6 +113,9 @@ loss = []
 
 # Comparison of the weights
 lsq = []
+
+h_mse = []
+j_mse = []
 
 # Loop for the gradient descend
 for i in range(m):
@@ -141,6 +144,9 @@ for i in range(m):
     l = np.einsum("i, i ->", h_0, mean_s) + np.einsum("ij, ij ->", j_0, mean_s2) / 2
     loss.append(-l)
 
+    h_mse.append(np.mean((h_0 - h) ** 2))
+    j_mse.append(np.mean(((j_0 - j) * n) ** 2))
+
     # Progress
     if i % 10 == 0 : 
         print("Gradient descend step {}".format(i))
@@ -148,6 +154,22 @@ for i in range(m):
         print("loss : {:.5f}\n".format(-l))
 
         
+x = np.arange(len(h_mse))
+
+fig, ax = plt.subplots()
+
+ax.plot(x, h_mse, color = "crimson", label = r"MSE of $h$", zorder = 10)
+ax.plot(x, j_mse, color = "royalblue", label = r"MSE of $J$", zorder = 10)
+
+ax.grid()
+ax.legend()
+
+ax.set_ylabel("Normalised MSE")
+ax.set_xlabel("Train Step")
+
+plt.savefig(dir + "./Figures/coupling_mse.png")
+plt.show()
+
 # Plot of the loss
 fig, ax = plt.subplots()
 

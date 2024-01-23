@@ -30,10 +30,12 @@ n = 160
 h = np.genfromtxt(dir + "2.1 Equilibrium Model/Loss & Weights/H_history_eq.txt", delimiter = " ")
 j = np.genfromtxt(dir + "2.1 Equilibrium Model/Loss & Weights/J_history_eq.txt", delimiter = " ")
 
-h = np.mean(h, axis = 0)
-
 j = np.reshape(j, (99, n, n))
-j = np.mean(j, axis = 0)
+# h = np.mean(h, axis = 0)
+# j = np.mean(j, axis = 0)
+
+h = h[-1]
+j = j[-1]
 
 # Train measurements
 s_train = np.genfromtxt(dir + "Measurements/Equilibrium/s_train.txt", delimiter = " ")
@@ -184,6 +186,9 @@ for i in range(n):
         s2[i, j] = np.mean(s[:, i] * s[:, j])
 
 s = np.mean(s, axis = 0)
+
+print(np.mean((s2 - s2_test) ** 2))
+print(np.mean((s - s_test) ** 2))
 
 # Plot of the magnetisation
 fig, ax = plt.subplots()
