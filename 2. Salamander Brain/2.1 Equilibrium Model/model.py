@@ -156,6 +156,9 @@ start = time()
 J_history = []
 H_history = []
 
+mse_s = []
+mse_s2 = []
+
 # Loop for the gradient descend
 for i in range(m):
 
@@ -175,13 +178,19 @@ for i in range(m):
     mean_s2_0 = np.mean(s2_0, axis = 0)
 
     # Gradient descend update steps
-    h += a * (mean_s - mean_s_0)
-    j += a * (mean_s2 - mean_s2_0)
+    dh = (mean_s - mean_s_0)
+    dj = (mean_s2 - mean_s2_0)
 
-    print((mean_s - mean_s_0))
+    h += a * dh
+    j += a * dj
+
+    # We save the mse values to take a look at them later
+    mse_s.append(np.mean(dh ** 2))
+    mse_s2.append(np.mean(dj ** 2))
  
     l = np.einsum("i, i ->", h, mean_s) + np.einsum("ij, ij ->", j, mean_s2) / 2
     loss.append(-l)
+
 
     # Progress
     if i % 10 == 0 : 
@@ -190,7 +199,10 @@ for i in range(m):
 
         print("Gradient descend step {}".format(i))
         print("Loss value     : {:.3f}".format(-l))
-        print("Time / 10 steps: {:6.2f} s \n".format(end - start))
+        print("Time / 10 steps: {:6.2f} s".format(end - start))
+        print("Magnetisation MSE: {:.5f}".format(np.mean((mean_s - mean_s_0) ** 2)))
+        print("Correlation   MSE: {:.5f}\n".format(np.mean((mean_s2 - mean_s2_0) ** 2)))
+
 
         start = time()
 
