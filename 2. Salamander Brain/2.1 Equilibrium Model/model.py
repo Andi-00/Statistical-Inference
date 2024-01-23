@@ -177,6 +177,8 @@ for i in range(m):
     # Gradient descend update steps
     h += a * (mean_s - mean_s_0)
     j += a * (mean_s2 - mean_s2_0)
+
+    print((mean_s - mean_s_0))
  
     l = np.einsum("i, i ->", h, mean_s) + np.einsum("ij, ij ->", j, mean_s2) / 2
     loss.append(-l)
