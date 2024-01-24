@@ -120,7 +120,7 @@ print(np.einsum("ij, nj -> ni", j_0, s0).shape)
 for i in range(m):
 
     # Computation of theta for the gradients
-    theta = np.einsum("ij, nj -> ni", j_0, s0) + h_0
+    theta = np.einsum("ij, nj -> ni", j_0, s0) + np.reshape(h_0, (1, -1))
     
     # Computation of the updates 
     dh = np.mean(s1, axis = 0) - np.mean(np.tanh(theta), axis = 0)
