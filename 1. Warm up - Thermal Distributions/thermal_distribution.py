@@ -1,5 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
+from scipy.stats import linregress
 
 plt.rcParams['pgf.rcfonts'] = False
 plt.rcParams['font.serif'] = []
@@ -21,10 +22,10 @@ plt.rcParams['savefig.pad_inches'] = 0.1
 plt.rcParams['figure.figsize'] = (10, 7)
 
 # Directory of the current folder
-dir = "./1. Warm Up - Thermal Distributions/"
+dir = "./1. Warm up - Thermal Distributions/"
 
 # Set a random seed
-rng = np.random.default_rng()
+rng = np.random.default_rng(2)
 
 # Number of spins
 n = 5
@@ -103,7 +104,7 @@ for i in range(n):
     j_0[:, i] = j_0[i, :]
 
 # Number of steps for the gradient descend
-m = int(1E3)
+m = int(2E3)
 
 # Learning rate a
 a = 0.2
@@ -116,6 +117,41 @@ lsq = []
 
 h_mse = []
 j_mse = []
+
+# Plotting
+def plot(h, j, h_0, j_0, i):
+    fig, ax = plt.subplots()
+
+    ax.scatter(h, h_0, color = "crimson", label = r"$h_i$", zorder = 10)
+    ax.scatter(j.flatten() * n, j_0.flatten() * n, color = "royalblue", label = r"$J_{ij}$", zorder = 10)
+
+    theta = np.append(j * n, h).flatten()
+    theta_0 = np.append(j_0 * n, h_0).flatten()
+
+    a = linregress(theta, theta_0)
+
+    # Slope and intersection
+    b = a[1]
+    a = a[0]
+
+    x = np.arange(-3, 3, 0.01)
+    ax.plot(x, a *x + b, color = "black", zorder = 3, label = "fit")
+
+    print(a)
+    print(b)
+
+    ax.grid()
+    ax.legend()
+
+    ax.set_ylabel(r"$\theta_\mathrm{infered} / \sigma$")
+    ax.set_xlabel(r"$\theta_\mathrm{true} / \sigma$")
+
+    ax.set_title("Iteration {:4}, parameter $a$ = {:.4f}, $b$ = {:.4f}".format(i, a, b), y = 1.01)
+
+    plt.savefig(dir + "Figures/scatter_couplings_{}.png".format(i))
+
+
+plot(h, j, h_0, j_0, 0)
 
 # Loop for the gradient descend
 for i in range(m):
@@ -147,85 +183,87 @@ for i in range(m):
     h_mse.append(np.mean((h_0 - h) ** 2))
     j_mse.append(np.mean(((j_0 - j) * n) ** 2))
 
+    if i == 10 or i == 50 or i == 100 or i == 1000: plot(h, j, h_0, j_0, i)
+
     # Progress
     if i % 10 == 0 : 
         print("Gradient descend step {}".format(i))
         print("mean squared weights : {:.5f}".format(lsq[-1]))
         print("loss : {:.5f}\n".format(-l))
 
-        
-x = np.arange(len(h_mse))
 
-fig, ax = plt.subplots()
+plot(h, j, h_0, j_0, 2000)
 
-ax.plot(x, h_mse, color = "crimson", label = r"MSE of $h$", zorder = 10)
-ax.plot(x, j_mse, color = "royalblue", label = r"MSE of $J$", zorder = 10)
+# fig, ax = plt.subplots()
 
-ax.grid()
-ax.legend()
+# ax.plot(x, h_mse, color = "crimson", label = r"MSE of $h$", zorder = 10)
+# ax.plot(x, j_mse, color = "royalblue", label = r"MSE of $J$", zorder = 10)
 
-ax.set_ylabel("Normalised MSE")
-ax.set_xlabel("Train Step")
+# ax.grid()
+# ax.legend()
 
-plt.savefig(dir + "./Figures/coupling_mse.png")
-plt.show()
+# ax.set_ylabel("Normalised MSE")
+# ax.set_xlabel("Train Step")
 
-# Plot of the loss
-fig, ax = plt.subplots()
+# plt.savefig(dir + "Figures/coupling_mse.png")
+# plt.show()
 
-x = np.arange(len(loss))
+# # Plot of the loss
+# fig, ax = plt.subplots()
 
-ax.plot(x, loss, color = "black")
-ax.scatter(x, loss, color = "crimson", zorder = 10)
+# x = np.arange(len(loss))
 
-ax.grid()
-ax.set_xlabel("Number of steps")
-ax.set_ylabel("Negative log-likelihood $\mathcal L$")
-ax.set_title("Loss during the training")
+# ax.plot(x, loss, color = "black")
+# ax.scatter(x, loss, color = "crimson", zorder = 10)
 
-plt.savefig(dir + "Figures/loss_plot_2.png")
+# ax.grid()
+# ax.set_xlabel("Number of steps")
+# ax.set_ylabel("Negative log-likelihood $\mathcal L$")
+# ax.set_title("Loss during the training")
 
-fig, ax = plt.subplots()
+# plt.savefig(dir + "Figures/loss_plot_2.png")
 
-ax.scatter(lsq, loss, color = "black", zorder = 10)
-ax.grid()
-ax.set_ylabel("Loss $\mathcal L$")
-ax.set_xlabel("MSE")
+# fig, ax = plt.subplots()
 
-plt.savefig(dir + "Figures/loss_MSE_2.png")
+# ax.scatter(lsq, loss, color = "black", zorder = 10)
+# ax.grid()
+# ax.set_ylabel("Loss $\mathcal L$")
+# ax.set_xlabel("MSE")
 
-# Comparison of the true and infered couplings
-dh = h_0 - h
-dj = (j_0 - j) * n
+# plt.savefig(dir + "Figures/loss_MSE_2.png")
 
-temp = []
+# # Comparison of the true and infered couplings
+# dh = h_0 - h
+# dj = (j_0 - j) * n
 
-for i in range(n):
-    for k in range(i):
-        temp.append(dj[i, k])
+# temp = []
 
-dj = np.array(temp)
+# for i in range(n):
+#     for k in range(i):
+#         temp.append(dj[i, k])
+
+# dj = np.array(temp)
 
 
-print(h)
-print(h_0)
-print(j)
-print(j_0)
+# print(h)
+# print(h_0)
+# print(j)
+# print(j_0)
 
-# Plot of the histogram
-fig, ax = plt.subplots()
+# # Plot of the histogram
+# fig, ax = plt.subplots()
 
-errors = np.append(dh.flatten(), dj.flatten())
+# errors = np.append(dh.flatten(), dj.flatten())
 
-b = np.arange(-1, 1.12, 0.1) - 0.05
+# b = np.arange(-1, 1.12, 0.1) - 0.05
 
-ax.grid()
-ax.hist(errors, bins = b, color = "crimson", edgecolor = "black", zorder  = 10)
+# ax.grid()
+# ax.hist(errors, bins = b, color = "crimson", edgecolor = "black", zorder  = 10)
 
-ax.set_xlabel(r"Normalised Error $\Delta \theta / \sigma$")
-ax.set_ylabel("Number of counts")
-ax.set_title("Histogram of the Deviations")
+# ax.set_xlabel(r"Normalised Error $\Delta \theta / \sigma$")
+# ax.set_ylabel("Number of counts")
+# ax.set_title("Histogram of the Deviations")
 
-plt.savefig(dir + "Figures/hisogram_2.png")
+# plt.savefig(dir + "Figures/hisogram_2.png")
 
-plt.show()
+# plt.show()
